@@ -29,7 +29,7 @@ resource "google_project_service" "dns_googleapis_com" {
 # 10.0.0.0/24   => Source VPC Clients
 # 10.0.1.0/24   => Source VPC Proxies
 # 10.0.0.0/24   => Destination VPC NAT
-# 10.0.1.0/24   => Destination VPC Servers
+# 10.0.10.0/24   => Destination VPC Servers
 # 10.10.0.0/24  => Destination VCP Managed load balancer proxy-only subnet
 resource "google_compute_network" "source_vpc" {
   project = var.project_id

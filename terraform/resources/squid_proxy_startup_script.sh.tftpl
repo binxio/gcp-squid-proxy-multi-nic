@@ -35,28 +35,11 @@ SOURCE_CIDR=$(ip -o -4 addr show dev ens5 | awk '{print $4}')
 SOURCE_IP=$${SOURCE_CIDR%"/32"}
 
 SOURCE_GW_IP=$(ip route | grep 'dev ens5 scope link' | awk '{print $1}')
-SOURCE_GW_SUBNET=$(ip route | grep "via $SOURCE_GW_IP dev ens5 proto dhcp" | awk '{print $1}')
-
-DEFAULT_CIDR=$(ip -o -4 addr show dev ens4 | awk '{print $4}')
-DEFAULT_IP=$${DEFAULT_CIDR%"/32"}
-
-DEFAULT_GW_IP=$(ip route | grep 'default via' | awk '{print $3}')
 
 # Return load balanced traffic over source VPC interface
 echo "1 source" >> /etc/iproute2/rt_tables
-ip rule add priority 100 from ${load_balancer_ip} table source
+ip rule add from ${load_balancer_ip} table source
 ip route add default via $SOURCE_GW_IP dev ens5 src $SOURCE_IP table source
-
-# Route secondary nic traffic to destination VPC (including the source IP)
-echo "2 destination" >> /etc/iproute2/rt_tables
-ip rule add priority 200 to $SOURCE_IP table destination
-ip rule add priority 400 to $SOURCE_GW_SUBNET table destination
-ip route add $DEFAULT_GW_IP dev ens4 scope link src $DEFAULT_IP table destination
-ip route add default via $DEFAULT_GW_IP dev ens4 src $DEFAULT_IP table destination
-
-# Reorder routes to  is handled at the right moment in time
-ip rule add priority 300 lookup local
-ip rule delete priority 0 lookup local
 
 
 ## Proxy configuration..
