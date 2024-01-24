@@ -80,7 +80,7 @@ resource "google_compute_subnetwork" "destination_vpc_servers" {
   network       = google_compute_network.destination_vpc.id
   name          = "${google_compute_network.destination_vpc.name}-servers"
   region        = "europe-west1"
-  ip_cidr_range = "10.0.1.0/24"
+  ip_cidr_range = "10.0.10.0/24"
 
   private_ip_google_access = true
 }
